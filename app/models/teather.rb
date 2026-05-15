@@ -1,2 +1,0 @@
-class Teather < ApplicationRecord
-end
