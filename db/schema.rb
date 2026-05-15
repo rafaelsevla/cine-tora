@@ -10,9 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_15_010342) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_011641) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "genres", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_genres_on_name", unique: true
+  end
+
+  create_table "movies", force: :cascade do |t|
+    t.string "country_code", null: false
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.integer "duration_in_minutes", null: false
+    t.string "image_url"
+    t.string "name", null: false
+    t.string "original_language", null: false
+    t.date "release_date", null: false
+    t.string "small_description"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "movies_genres", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "genre_id", null: false
+    t.boolean "main_genre", default: false
+    t.bigint "movie_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["genre_id"], name: "index_movies_genres_on_genre_id"
+    t.index ["movie_id", "genre_id"], name: "index_movies_genres_on_movie_id_and_genre_id", unique: true
+    t.index ["movie_id"], name: "index_movies_genres_on_movie_id"
+  end
 
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -31,5 +62,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_010342) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "movies_genres", "genres"
+  add_foreign_key "movies_genres", "movies"
   add_foreign_key "sessions", "users"
 end
