@@ -1,0 +1,41 @@
+#!/bin/bash
+# bin/start - Inicia Cine Tora com tmux
+
+# Verifica se tmux está instalado
+if ! command -v tmux &> /dev/null; then
+  echo "❌ tmux não encontrado"
+  echo "Instale com: brew install tmux (Mac) ou sudo apt install tmux (Linux)"
+  exit 1
+fi
+
+SESSION="cine_tora"
+
+# Mata sessão existente se houver
+tmux kill-session -t $SESSION 2>/dev/null
+
+# Cria nova sessão
+tmux new-session -d -s $SESSION -n "db"
+
+# Janela 1: Banco de dados
+tmux send-keys -t $SESSION:db "docker compose up" Enter
+
+# Aguarda banco iniciar
+sleep 3
+
+# Janela 2: Aplicação (split vertical)
+tmux new-window -t $SESSION -n "app"
+tmux send-keys -t $SESSION:app "bin/dev" Enter
+
+# Janela 3: Logs do banco (opcional)
+tmux new-window -t $SESSION -n "logs"
+tmux send-keys -t $SESSION:logs "docker compose logs -f" Enter
+
+# Janela 4: Rails console (pronto para usar)
+tmux new-window -t $SESSION -n "console"
+tmux send-keys -t $SESSION:console "echo 'Para abrir console: rails c'" Enter
+
+# Volta para janela da aplicação
+tmux select-window -t $SESSION:app
+
+# Anexa à sessão
+tmux attach -t $SESSION

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+SESSION="cine_tora"
+
+echo "🛑 Parando containers..."
+docker compose down
+
+echo "🔚 Fechando sessão tmux..."
+tmux kill-session -t $SESSION 2>/dev/null
+
+echo "✅ Cine Tora finalizado"

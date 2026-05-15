@@ -1,0 +1,27 @@
+#!/bin/bash
+# bin/start_tmux - Roda banco e app em split screen
+
+# Verifica se tmux está instalado
+if ! command -v tmux &> /dev/null; then
+  echo "tmux não encontrado. Instale com: brew install tmux (Mac) ou sudo apt install tmux (Linux)"
+  exit 1
+fi
+
+# Mata sessão existente se houver
+tmux kill-session -t cinelog 2>/dev/null
+
+# Cria nova sessão com banco
+tmux new-session -d -s cinelog -n "db"
+tmux send-keys -t cinelog:db "docker compose up" Enter
+
+# Cria janela para a aplicação
+tmux new-window -t cinelog -n "app"
+tmux send-keys -t cinelog:app "sleep 3 && bin/dev" Enter
+
+# Cria janela para logs
+tmux new-window -t cinelog -n "logs"
+tmux send-keys -t cinelog:logs "docker compose logs -f" Enter
+
+# Anexa à sessão
+tmux select-window -t cinelog:app
+tmux attach -t cinelog
