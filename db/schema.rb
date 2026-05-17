@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_17_153710) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_17_155447) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,6 +33,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_153710) do
     t.string "name", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_genres_on_name", unique: true
+  end
+
+  create_table "group_permissions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "permission", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_group_id", null: false
+    t.index ["user_group_id", "permission"], name: "index_group_permissions_on_user_group_id_and_permission", unique: true
+    t.index ["user_group_id"], name: "index_group_permissions_on_user_group_id"
   end
 
   create_table "movies", force: :cascade do |t|
@@ -143,6 +152,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_153710) do
     t.index ["user_id"], name: "index_tickets_on_user_id"
   end
 
+  create_table "user_groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "user_has_user_groups", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_group_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_group_id"], name: "index_user_has_user_groups_on_user_group_id"
+    t.index ["user_id", "user_group_id"], name: "index_user_has_user_groups_on_user_id_and_user_group_id", unique: true
+    t.index ["user_id"], name: "index_user_has_user_groups_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -153,6 +178,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_153710) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "group_permissions", "user_groups"
   add_foreign_key "movies_genres", "genres"
   add_foreign_key "movies_genres", "movies"
   add_foreign_key "payments", "tickets"
@@ -165,4 +191,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_17_153710) do
   add_foreign_key "tickets", "seats"
   add_foreign_key "tickets", "showtimes"
   add_foreign_key "tickets", "users"
+  add_foreign_key "user_has_user_groups", "user_groups"
+  add_foreign_key "user_has_user_groups", "users"
 end
